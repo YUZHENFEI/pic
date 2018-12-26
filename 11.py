@@ -3,7 +3,7 @@ from PIL import Image
 import numpy as np
 import sys
 import time
-
+import matplotlib.pyplot as plt
 
 
 #先将 input image 填充为正方形  
@@ -53,59 +53,83 @@ if __name__ == '__main__':
 	size = width,height
 	#打印一下分辨率
 	print(repr(size))
-	pre_frame = None
-	 
+
+	ret, frame = camera.read()
+	if not ret:
+		print("打开摄像头失败1")
+	cv2.imwrite('1.jpg', frame)
+    # np.array convert to PIL.Image
+    # img = Image.fromarray(frame)
+	img = Image.open('1.jpg')
+    #image.show()  
+	img = fill_image(img)  
+	image_list = cut_image(img)
+	img = image_list[4]
+	img = np.array(img)
+	gray_pic = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	gray_pic = cv2.resize(gray_pic, (480, 480))
+	gray_pic = cv2.GaussianBlur(gray_pic, (21, 21), 0)
+	pre_frame = gray_pic
+
 	while (1):
+		ret, frame = camera.read()
 	    # 读取视频流
-	    ret, frame = camera.read()
-	    cv2.imwrite('1.jpg', frame)
-	    # np.array convert to PIL.Image
-	    # img = Image.fromarray(frame)
-	    img = Image.open('1.jpg')     
-	    #image.show()  
-	    img = fill_image(img)  
-	    image_list = cut_image(img)
-	    img = image_list[4]
+	    
 
 	    # 转灰度图
 	    # gray_pic = img.convert('L')
 	    # PIL.Image convert to np.array
-	    img = np.array(img)
-	    gray_pic = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+	    
 	 
-	    if not ret:
-	        print("打开摄像头失败")
-	        break
-	 
-	    cv2.imshow("capture", frame)
-	    gray_pic = cv2.resize(gray_pic, (480, 480))
-	    gray_pic = cv2.GaussianBlur(gray_pic, (21, 21), 0)
-	    if pre_frame is None:
-	        pre_frame = gray_pic
-	    else:
-	        # absdiff把两幅图的差的绝对值输出到另一幅图上面来
-	        img_delta = cv2.absdiff(pre_frame, gray_pic)
-	        # threshold阈值函数(原图像应该是灰度图,对像素值进行分类的阈值,当像素值高于（有时是小于）阈值时应该被赋予的新的像素值,阈值方法)
-	        thresh = cv2.threshold(img_delta, 30, 255, cv2.THRESH_BINARY)[1]
-	        # 用一下腐蚀与膨胀
-	        thresh = cv2.dilate(thresh, None, iterations=2)
-	        # findContours检测物体轮廓(寻找轮廓的图像,轮廓的检索模式,轮廓的近似办法)
-	        image, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-	        for c in contours:
-	            # 设置敏感度
-	            # contourArea计算轮廓面积
-	            if cv2.contourArea(c) < 1000:
-	                continue
-	            else:
-	                print(time.strftime("%H:%M:%S",time.localtime(time.time())))
-	                print("探测到物体！！！")
-	                # 保存图像
-	                TI = time.strftime('%Y-%m-%d', time.localtime(time.time()))
-	                # cv2.imwrite("D:\\python\\first_j\\" + "JC"+TI+ '.jpg', frame)
-	                break
-	        pre_frame = gray_pic
-	 
-	    if cv2.waitKey(1) & 0xFF == ord('q'):
-	        break
+		if not ret:
+			print("打开摄像头失败")
+			break
+
+		cv2.imshow("capture", frame)
+		cv2.imwrite('frame.jpg', frame)
+    # np.array convert to PIL.Image
+    # img = Image.fromarray(frame)
+		frame = Image.open('frame.jpg')
+    #image.show()  
+		frame = fill_image(frame)  
+		image_list = cut_image(frame)
+		frame = image_list[4]
+		frame = np.array(frame)
+		gray_pic = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+		gray_pic = cv2.resize(gray_pic, (480, 480))
+		gray_pic = cv2.GaussianBlur(gray_pic, (21, 21), 0)
+		if pre_frame is None:
+		    pre_frame = gray_pic
+		else:
+			# absdiff把两幅图的差的绝对值输出到另一幅图上面来
+			img_delta = cv2.absdiff(pre_frame, gray_pic)
+			# threshold阈值函数(原图像应该是灰度图,对像素值进行分类的阈值,当像素值高于（有时是小于）阈值时应该被赋予的新的像素值,阈值方法)
+			thresh = cv2.threshold(img_delta, 30, 255, cv2.THRESH_BINARY)[1]
+			# 用一下膨胀
+			thresh = cv2.dilate(thresh, None, iterations=2)
+			# findContours检测物体轮廓(寻找轮廓的图像,轮廓的检索模式,轮廓的近似办法)
+			image, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+			print(contours)
+			for c in contours:
+				# 设置敏感度
+				# contourArea计算轮廓面积
+				if cv2.contourArea(c) < 1000:
+				    continue
+				else:
+					p=cv2.imread('2.jpg')
+					plt.imshow(p)
+					plt.axis('off')
+					plt.pause(0.5)
+					plt.close()
+					print(time.strftime("%H:%M:%S",time.localtime(time.time())))
+					print("探测到物体！！！")
+					# 保存图像
+					TI = time.strftime('%Y-%m-%d', time.localtime(time.time()))
+					# cv2.imwrite("D:\\python\\first_j\\" + "JC"+TI+ '.jpg', frame)
+					break
+			pre_frame = gray_pic
+
+		if cv2.waitKey(1) & 0xFF == ord('q'):
+			break
 	camera.release()
 	cv2.destroyAllWindows()
