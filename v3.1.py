@@ -23,22 +23,21 @@ def cut_image(image,d):
 
 
 def show():
-	global off
-	while(1):
-		ret,frame = camera.read()
-		cv2.imshow('Video',frame)
-		if cv2.waitKey(1) & 0xFF == ord('q'):
-			off = 1
-			break
-	camera.release()
-	cv2.destroyAllWindows()
+    global off
+    while(1):
+        ret,frame = camera.read()
+	cv2.imshow('Video',frame)
+	if cv2.waitKey(1) & 0xFF == ord('q'):
+	    off = 1
+	    break
+    camera.release()
+    cv2.destroyAllWindows()
 
 
 def det():
 	global isDetected
 	global off
 	img = Image.open('1.jpg')
-    #image.show()  
 	image_list = cut_image(img,3)
 	img = image_list[4]
 	img = np.array(img)
@@ -50,13 +49,12 @@ def det():
 	print('--Q键退出')
 	while (1):
 		ret, frame = camera.read()
-	    # 读取视频流
+		# 读取视频流
 		if not ret:
 			print("--打开摄像头失败2")
 			break
 		cv2.imwrite('2.jpg', frame)
 		img = Image.open('2.jpg')
-	    #image.show()  
 		image_list = cut_image(img,3)
 		img = image_list[4]
 		img = np.array(img)
@@ -73,7 +71,7 @@ def det():
 		image, contours, hierarchy = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 		for c in contours:
 			if cv2.contourArea(c) < 1000:
-				    continue
+					continue
 			else:
 				isDetected = 1
 				break
