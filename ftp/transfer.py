@@ -1,0 +1,44 @@
+# FTP操作
+import ftplib
+
+
+
+def ftp_download():
+    '''以二进制形式下载文件'''
+    file_remote = '1.txt'
+    file_local = 'D:\\test_data\\ftp_download.txt'
+    bufsize = 1024  # 设置缓冲器大小
+    fp = open(file_local, 'wb')
+    f.retrbinary('RETR %s' % file_remote, fp.write, bufsize)
+    fp.close()
+
+
+def ftp_upload():
+    '''以二进制形式上传文件'''
+    file_remote = 'video.avi'
+    file_local = 'D:\\yuzhenfei-SVN\\yuzhenfei\\图像识别\\demo\\pic\\lianzheng.avi'
+    bufsize = 1024  # 设置缓冲器大小
+    fp = open(file_local, 'rb')
+    f.storbinary('STOR ' + file_remote, fp, bufsize)
+    fp.close()
+
+
+if __name__ == '__main__':
+    host = 'www.aiforu.com'
+    username = 'admin_camera'
+    password = 'QcZ8M9aDga'
+    # file = '1.txt'
+
+    f = ftplib.FTP(host)  # 实例化FTP对象
+    f.login(username, password)  # 登录
+
+    # 获取当前路径
+    pwd_path = f.pwd()
+    print("FTP当前路径:", pwd_path)
+
+
+    # 逐行读取ftp文本文件
+    # f.retrlines('RETR %s' % file)
+    # ftp_download()
+    ftp_upload()
+    f.quit()
