@@ -3,7 +3,10 @@ import cv2
 cam0 = cv2.VideoCapture(0)
 cam1 = cv2.VideoCapture(1)
 
+# windows7 + python3.7+ opencv 3.4
 fourcc = cv2.VideoWriter_fourcc(*'XVID')
+# Raspberry pi+ python2.7+opencv 2.4.9
+# fourcc = cv2.cv.CV_FOURCC('m', 'p', '4', 'v')
 out0 = cv2.VideoWriter('out0.avi', fourcc, 20.0, (640, 480))
 out1 = cv2.VideoWriter('out1.avi', fourcc, 20.0, (640, 480))
 
